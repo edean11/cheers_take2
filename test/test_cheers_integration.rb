@@ -2,7 +2,7 @@ require 'minitest/autorun'
 
 class TestCheersIntegration < MiniTest::Test
 
-	def test_that_the_tests_run
+	def test_help_message
 		output = `./cheers`
 		expected = <<EOS
 I'd cheer for you, if only I knew who you were :(
