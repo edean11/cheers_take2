@@ -1,3 +1,70 @@
 #!/usr/bin/env ruby
+require 'date'
 
-puts "I'd cheer for you, if only I knew who you were :(\nTry again with `./cheers [Name] [MM/DD Birthday]`"
+$arguments = ARGV
+$name_ind = 0
+$valid_name = false
+
+def print_usage_instructions
+	puts "I'd cheer for you, if only I knew who you were :(\nTry again with `./cheers [Name] [MM/DD Birthday]`"
+end
+
+def print_invalid_date_instructions
+	puts "I couldn't understand that. Could you give that to me in mm/dd format?"
+end
+
+def validate(ind)
+	$arguments[ind].match(/[a-zA-Z]*(-)?[a-zA-z]*/).to_s.length == $arguments[ind].to_s.length
+end
+
+def cheer(name)
+	an_letters = "AEIOFHLMRSXN"
+	name.each_char do |letter|
+		article = an_letters.include?(letter) ? "an" : "a"
+		puts "Give me #{article}...#{letter}!"
+	end
+	if $name_ind == 1
+		puts $arguments[0].chomp+" "+$arguments[1].chomp+"'s just GRAND!"
+	else
+		puts $arguments[0].chomp + "'s just GRAND!"
+	end
+end
+
+if !$arguments[0]
+	print_usage_instructions
+end
+
+if $arguments[0]
+	if validate(0)
+		$valid_name = true
+		name = $arguments[0].chomp.upcase
+		if $arguments[1] && validate(1)
+			name << $arguments[1].chomp.upcase
+			$name_ind += 1
+		end
+		name.gsub!(/[^\w]/,"")
+		cheer(name)
+		puts "I would wish you a Happy Birthday, if only i knew when that was!" if !$arguments[$name_ind+1]
+	else print_usage_instructions
+	end
+end
+
+if $arguments[$name_ind] && $arguments[$name_ind+1] && $valid_name
+	puts
+	begin
+		if Date.parse($arguments[$name_ind+1].chomp)
+			birthday = Date.parse($arguments[$name_ind+1].chomp).yday
+			now = DateTime.now.yday
+			diff = birthday - now
+			if diff < 0
+				puts "Awesome! Your birthday is in #{365-(diff*-1)} days! Happy Birthday in advance!"
+				elsif diff == 0
+					puts "Happy Birthday!"
+				else
+					puts "Awesome! Your birthday is in #{diff} days! Happy Birthday in advance!"
+			end
+		end
+	rescue
+		print_invalid_date_instructions
+	end
+end
